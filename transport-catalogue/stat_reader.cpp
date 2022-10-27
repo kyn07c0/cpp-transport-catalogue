@@ -43,28 +43,28 @@ std::ostream& operator<<(std::ostream& out, const transport::detail::StopInfo& i
     return out;
 }
 
-void transport::print::RouteInfo(Catalogue& transport_catalogue, const std::string& query_info)
+void transport::print::RouteInfo(std::ostream& out, Catalogue& catalogue, const std::string& query_info)
 {
-    std::cout << transport_catalogue.GetRouteInfo(query_info) << std::endl;
+    out << catalogue.GetRouteInfo(query_info) << std::endl;
 }
 
-void transport::print::StopInfo(transport::Catalogue& transport_catalogue, const std::string& query_info)
+void transport::print::StopInfo(std::ostream& out, transport::Catalogue& catalogue, const std::string& query_info)
 {
-    std::cout << transport_catalogue.GetStopInfo(query_info) << std::endl;
+    out << catalogue.GetStopInfo(query_info) << std::endl;
 }
 
-void transport::print::OutputReader(transport::Catalogue& transport_catalogue)
+void transport::print::ExecuteRequests(std::istream& in, transport::Catalogue& catalogue)
 {
     int query_count;
-    std::cin >> query_count;
-    std::cin.get();
+    in >> query_count;
+    in.get();
 
     std::vector<std::pair<std::string, std::string>> queries;
 
     for(int i = 0; i < query_count; ++i)
     {
         std::string query;
-        std::getline(std::cin, query);
+        std::getline(in, query);
 
         if(query.find("Bus") == 0)
         {
@@ -84,11 +84,11 @@ void transport::print::OutputReader(transport::Catalogue& transport_catalogue)
     {
         if(name == "Stop")
         {
-            transport::print::StopInfo(transport_catalogue, str);
+            transport::print::StopInfo(std::cout, catalogue, str);
         }
         if(name == "Bus")
         {
-            transport::print::RouteInfo(transport_catalogue, str);
+            transport::print::RouteInfo(std::cout, catalogue, str);
         }
     }
 }

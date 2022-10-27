@@ -13,22 +13,18 @@ namespace detail {
 
     struct Stop
     {
-        Stop(std::string name, geo::Coordinates coordinates) : name_(std::move(name)), coordinates_(coordinates)
-        {
-        }
-
         std::string name_;
         geo::Coordinates coordinates_;
+        std::set<std::string_view> buses_;
     };
 
     struct Route
     {
-        Route(std::string name, std::deque<Stop*> stops) : name_(std::move(name)), stops_(std::move(stops))
-        {
-        }
-
         std::string name_;
         std::deque<Stop*> stops_;
+        std::set<std::string_view> unique_stops_;
+        double geo_distance_;
+        uint32_t distance_;
     };
 
     struct StopInfo

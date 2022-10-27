@@ -7,8 +7,8 @@
 
 namespace transport::print {
 
-    void OutputReader(transport::Catalogue& transport_catalogue);
-    void RouteInfo(transport::Catalogue& transport_catalogue, const std::string& query_info);
-    void StopInfo(transport::Catalogue& transport_catalogue, const std::string& query_info);
+    void RouteInfo(std::ostream& out, transport::Catalogue& catalogue, const std::string& query_info);
+    void StopInfo(std::ostream& out, transport::Catalogue& catalogue, const std::string& query_info);
+    void ExecuteRequests(std::istream& in, transport::Catalogue& catalogue);
 
 } // namespace transport::print

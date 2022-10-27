@@ -95,11 +95,37 @@ std::unordered_map<std::string, transport::query::Data> transport::query::Parse(
     return result;
 }
 
-void transport::query::InputReader(transport::Catalogue& transport_catalogue)
+void transport::query::AddStops(transport::Catalogue& catalogue, std::vector<transport::query::Data>& queries)
+{
+    for(auto& query : queries)
+    {
+        std::size_t offset = 0;
+        catalogue.AddStop(query.name, std::stod(query.values[0], &offset), std::stod(query.values[1], &offset));
+    }
+
+    for(auto& query : queries)
+    {
+        for(size_t i = 2; i < query.values.size(); ++i)
+        {
+            std::vector<std::string> distance = Split(query.values[i], "m to ");
+            catalogue.AddDistance(query.name, distance[1], stoi(distance[0]));
+        }
+    }
+}
+
+void transport::query::AddRoutes(transport::Catalogue& catalogue, std::vector<transport::query::Data>& queries)
+{
+    for(auto& query : queries)
+    {
+        catalogue.AddRoute(query.name, query.values);
+    }
+}
+
+transport::Catalogue transport::query::ReadCatalogue(std::istream& in)
 {
     int query_count;
-    std::cin >> query_count;
-    std::cin.get();
+    in >> query_count;
+    in.get();
 
     std::unordered_map<std::string, transport::query::Data> parse_queries;
     std::vector<transport::query::Data> stop_queries;
@@ -108,10 +134,9 @@ void transport::query::InputReader(transport::Catalogue& transport_catalogue)
     for(int i = 0; i < query_count; ++i)
     {
         std::string query;
-        std::getline(std::cin, query);
+        std::getline(in, query);
 
         parse_queries = Parse(query);
-
         if(parse_queries.count("Stop") != 0)
         {
             stop_queries.push_back(std::move(parse_queries.at("Stop")));
@@ -122,26 +147,9 @@ void transport::query::InputReader(transport::Catalogue& transport_catalogue)
         }
     }
 
-    // Add stops
-    for(auto& query : stop_queries)
-    {
-        std::size_t offset = 0;
-        transport_catalogue.AddStop(query.name, std::stod(query.values[0], &offset), std::stod(query.values[1], &offset));
-    }
+    transport::Catalogue transport_catalogue;
+    AddStops(transport_catalogue, stop_queries);
+    AddRoutes(transport_catalogue, route_queries);
 
-    // Add distances
-    for(auto& query : stop_queries)
-    {
-        for(size_t i = 2; i < query.values.size(); ++i)
-        {
-            std::vector<std::string> distance = Split(query.values[i], "m to ");
-            transport_catalogue.AddDistance(query.name, distance[1], stoi(distance[0]));
-        }
-    }
-
-    // Add routes
-    for(auto& query : route_queries)
-    {
-        transport_catalogue.AddRoute(query.name, query.values);
-    }
+    return transport_catalogue;
 }

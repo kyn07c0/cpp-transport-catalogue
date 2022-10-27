@@ -4,8 +4,8 @@
 
 int main()
 {
-    transport::Catalogue transport_catalogue = transport::query::ReadCatalogue(std::cin);
-    transport::print::ExecuteRequests(std::cin, transport_catalogue);
+    transport::Catalogue catalogue = transport::query::ReadCatalogue(std::cin);
+    transport::print::ExecuteRequests(std::cin, catalogue);
 
     return 0;
 }

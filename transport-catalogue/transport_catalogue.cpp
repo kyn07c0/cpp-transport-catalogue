@@ -6,7 +6,9 @@ void transport::Catalogue::AddStop(const std::string& name, double lat, double l
 {
     geo::Coordinates coordinates = {lat, lng};
 
-    auto *stop = new detail::Stop(name, coordinates);
+    auto *stop = new detail::Stop();
+    stop->name_ = name;
+    stop->coordinates_ = coordinates;
 
     base_stops_.push_back(*stop);
     stops_.insert({stop->name_, stop});
@@ -16,25 +18,32 @@ void transport::Catalogue::AddStop(const std::string& name, double lat, double l
 void transport::Catalogue::AddRoute(const std::string& name, const std::vector<std::string>& stops)
 {
     std::deque<detail::Stop*> deque_stops;
-
-    std::set<std::string_view> route_stops;
+    auto *route = new detail::Route();
+    route->name_ = name;
 
     for(const auto& stop : stops)
     {
         detail::Stop* s = FindStop(stop);
-        route_stops.insert(s->name_);
         deque_stops.push_back(s);
+        s->buses_.insert(route->name_);
+        route->unique_stops_.insert(s->name_);
     }
 
-    auto *route = new detail::Route(name, deque_stops);
+    route->stops_ = deque_stops;
+
+    for(auto stop : route->stops_)
+    {
+        stop_for_buses_[stop->name_].insert(route->name_);
+    }
+
+    for(size_t i = 0; i < route->stops_.size() - 1; ++i)
+    {
+        route->geo_distance_ += ComputeDistance(route->stops_[i]->coordinates_, route->stops_[i + 1]->coordinates_);
+        route->distance_ += GetDistance(route->stops_[i]->name_, route->stops_[i + 1]->name_);
+    }
 
     base_routes_.emplace_back(*route);
     routes_.insert({route->name_, route});
-
-    for(auto stop : route_stops)
-    {
-        stop_for_buses_[stop].insert(route->name_);
-    }
 }
 
 transport::detail::Stop* transport::Catalogue::FindStop(const std::string& name) const
@@ -91,10 +100,8 @@ transport::detail::StopInfo transport::Catalogue::GetStopInfo(const std::string&
         return stop_info;
     }
 
-    for(auto bus : stop_for_buses_.at(name))
-    {
-        stop_info.buses_.insert(bus);
-    }
+    detail::Stop* s = FindStop(name);
+    stop_info.buses_ = s->buses_;
 
     return stop_info;
 }
@@ -109,25 +116,11 @@ transport::detail::RouteInfo transport::Catalogue::GetRouteInfo(const std::strin
         return detail::RouteInfo({name, 0, 0, 0, 0.0});
     }
 
-    route_info.name_ = name;
+    route_info.name_ = route->name_;
     route_info.stops_count_ = route->stops_.size();
-
-    std::unordered_set<std::string_view> unique_stops;
-    for(const auto& stop : route->stops_)
-    {
-        unique_stops.insert(stop->name_);
-    }
-    route_info.unique_stops_count_ = unique_stops.size();
-
-    double geo_distance = 0.0;
-    uint32_t distance = 0;
-    for(size_t i = 0; i < route->stops_.size() - 1; ++i)
-    {
-        geo_distance += ComputeDistance(route->stops_[i]->coordinates_, route->stops_[i + 1]->coordinates_);
-        distance += GetDistance(route->stops_[i]->name_, route->stops_[i + 1]->name_);
-    }
-    route_info.distance_ = distance;
-    route_info.curvature_ = distance / geo_distance;
+    route_info.unique_stops_count_ = route->unique_stops_.size();
+    route_info.distance_ = route->distance_;
+    route_info.curvature_ = route->distance_ / route->geo_distance_;
 
     return route_info;
 }

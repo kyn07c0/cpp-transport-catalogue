@@ -16,8 +16,11 @@ namespace transport::query {
 
     std::unordered_map<std::string, Data> ParseStop(const std::string& query);
     std::unordered_map<std::string, Data> ParseRoute(const std::string& query);
-
     std::unordered_map<std::string, Data> Parse(const std::string& query);
-    void InputReader(transport::Catalogue& transport_catalogue);
+    
+    void AddStops(transport::Catalogue& catalogue, std::vector<transport::query::Data>& queries);
+    void AddRoutes(transport::Catalogue& catalogue, std::vector<transport::query::Data>& queries);
+
+    transport::Catalogue ReadCatalogue(std::istream& in);
 
 } // namespace transport::query

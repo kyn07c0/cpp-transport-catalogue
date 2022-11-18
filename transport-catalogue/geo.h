@@ -4,23 +4,24 @@
 
 namespace geo
 {
-    const double DR = M_PI / 180.;
+    
+const double DR = M_PI / 180.;
 
-    struct Coordinates
+struct Coordinates
+{
+    double lat;
+    double lng;
+    bool operator==(const Coordinates& other) const
     {
-        double lat;
-        double lng;
-        bool operator==(const Coordinates& other) const
-        {
-            return lat == other.lat && lng == other.lng;
-        }
+        return lat == other.lat && lng == other.lng;
+    }
 
-        bool operator!=(const Coordinates& other) const
-        {
-            return !(*this == other);
-        }
-    };
+    bool operator!=(const Coordinates& other) const
+    {
+        return !(*this == other);
+    }
+};
 
-    double ComputeDistance(Coordinates from, Coordinates to);
+double ComputeDistance(Coordinates from, Coordinates to);
 
 } // namespace geo

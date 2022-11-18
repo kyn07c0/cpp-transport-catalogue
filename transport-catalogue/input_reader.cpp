@@ -1,14 +1,15 @@
 #include "input_reader.h"
-#include <iostream>
 #include <algorithm>
 
-std::vector<std::string> transport::query::Split(std::string& str, const std::string& delimiter)
+namespace transport::query {
+
+std::vector<std::string> Split(std::string &str, const std::string &delimiter)
 {
     std::vector<std::string> result;
     size_t pos = str.find(delimiter);
     size_t substr_start_pos = 0;
 
-    while(pos != std::string::npos)
+    while (pos != std::string::npos)
     {
         std::string substr = str.substr(substr_start_pos, pos - substr_start_pos);
         result.push_back(substr);
@@ -22,11 +23,11 @@ std::vector<std::string> transport::query::Split(std::string& str, const std::st
     return result;
 }
 
-std::unordered_map<std::string, transport::query::Data> transport::query::ParseStop(const std::string& query)
+std::unordered_map<std::string, Data> ParseStop(const std::string &query)
 {
-    std::unordered_map<std::string, transport::query::Data> result;
+    std::unordered_map<std::string, Data> result;
 
-    transport::query::Data parsed_query;
+    Data parsed_query;
 
     size_t pos_name_start = query.find_first_of(' ');
     size_t pos_name_stop = query.find_first_of(':') - 1;
@@ -44,10 +45,10 @@ std::unordered_map<std::string, transport::query::Data> transport::query::ParseS
     return result;
 }
 
-std::unordered_map<std::string, transport::query::Data> transport::query::ParseRoute(const std::string& query)
+std::unordered_map<std::string, Data> ParseRoute(const std::string &query)
 {
-    std::unordered_map<std::string, transport::query::Data> result;
-    transport::query::Data parse_query;
+    std::unordered_map<std::string, Data> result;
+    Data parse_query;
 
     size_t pos_name_start = query.find_first_of(' ');
     size_t pos_name_stop = query.find_first_of(':') - 1;
@@ -79,9 +80,9 @@ std::unordered_map<std::string, transport::query::Data> transport::query::ParseR
     return result;
 }
 
-std::unordered_map<std::string, transport::query::Data> transport::query::Parse(const std::string& query)
+std::unordered_map<std::string, Data> Parse(const std::string &query)
 {
-    std::unordered_map<std::string, transport::query::Data> result;
+    std::unordered_map<std::string, Data> result;
 
     if(query.find("Stop") == 0)
     {
@@ -95,15 +96,15 @@ std::unordered_map<std::string, transport::query::Data> transport::query::Parse(
     return result;
 }
 
-void transport::query::AddStops(transport::Catalogue& catalogue, std::vector<transport::query::Data>& queries)
+void AddStops(transport::Catalogue &catalogue, std::vector<Data> &queries)
 {
-    for(auto& query : queries)
+    for(auto &query : queries)
     {
         std::size_t offset = 0;
         catalogue.AddStop(query.name, std::stod(query.values[0], &offset), std::stod(query.values[1], &offset));
     }
 
-    for(auto& query : queries)
+    for(auto &query : queries)
     {
         for(size_t i = 2; i < query.values.size(); ++i)
         {
@@ -113,23 +114,23 @@ void transport::query::AddStops(transport::Catalogue& catalogue, std::vector<tra
     }
 }
 
-void transport::query::AddRoutes(transport::Catalogue& catalogue, std::vector<transport::query::Data>& queries)
+void AddRoutes(transport::Catalogue &catalogue, std::vector<Data> &queries)
 {
-    for(auto& query : queries)
+    for(auto &query : queries)
     {
-        catalogue.AddRoute(query.name, query.values);
+        catalogue.AddRoute(query.name, query.values, false);
     }
 }
 
-transport::Catalogue transport::query::ReadCatalogue(std::istream& in)
+transport::Catalogue ReadCatalogue(std::istream &in)
 {
     int query_count;
     in >> query_count;
     in.get();
 
-    std::unordered_map<std::string, transport::query::Data> parse_queries;
-    std::vector<transport::query::Data> stop_queries;
-    std::vector<transport::query::Data> route_queries;
+    std::unordered_map<std::string, Data> parse_queries;
+    std::vector<Data> stop_queries;
+    std::vector<Data> route_queries;
 
     for(int i = 0; i < query_count; ++i)
     {
@@ -153,3 +154,5 @@ transport::Catalogue transport::query::ReadCatalogue(std::istream& in)
 
     return transport_catalogue;
 }
+
+} // namespace transport::query

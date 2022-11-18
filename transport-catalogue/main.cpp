@@ -1,11 +1,15 @@
 #include "transport_catalogue.h"
-#include "input_reader.h"
-#include "stat_reader.h"
+#include "json_reader.h"
+#include "map_renderer.h"
+#include "request_handler.h"
 
 int main()
 {
-    transport::Catalogue catalogue = transport::query::ReadCatalogue(std::cin);
-    transport::print::ExecuteRequests(std::cin, catalogue);
+    transport::Catalogue catalogue;
+    transport::renderer::MapRenderer map_renderer;
+    transport::request::RequestHandler request_handler(catalogue, map_renderer);
+    JsonReader json_reader(request_handler);
+    json_reader.Exec(std::cin, std::cout);
 
     return 0;
 }

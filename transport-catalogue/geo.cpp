@@ -1,6 +1,8 @@
 #include "geo.h"
 
 namespace geo {
+    
+inline const int RADIUS_EARTH = 6371000;
 
 double ComputeDistance(Coordinates from, Coordinates to)
 {
@@ -13,7 +15,7 @@ double ComputeDistance(Coordinates from, Coordinates to)
     return acos(sin(from.lat * DR) * sin(to.lat * DR)
                 + cos(from.lat * DR) * cos(to.lat * DR)
                 * cos(abs(from.lng - to.lng) * DR))
-                * 6371000;
+                * RADIUS_EARTH;
 }
 
 } // namespace geo

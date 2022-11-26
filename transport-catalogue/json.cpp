@@ -286,7 +286,7 @@ const Array& Node::AsArray() const
     return  std::get<Array>(value_);
 }
 
-const Dict& Node::AsMap() const
+const Dict& Node::AsDict() const
 {
     if(!IsDict())
     {
@@ -332,11 +332,6 @@ bool Node::IsArray() const
 }
 
 bool Node::IsDict() const
-{
-    return std::holds_alternative<Dict>(value_);
-}
-
-bool Node::IsMap() const
 {
     return std::holds_alternative<Dict>(value_);
 }
@@ -544,9 +539,9 @@ void Print(const Document& doc, std::ostream& output)
 
         return;
     }
-    if(root.IsMap())
+    if(root.IsDict())
     {
-        Dict map = root.AsMap();
+        Dict map = root.AsDict();
 
         output << '{';
         for(auto it = map.begin(); it != map.end(); ++it)

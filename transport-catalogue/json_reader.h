@@ -9,7 +9,8 @@
 
 namespace transport::request {
 
-class JsonReader {
+class JsonReader 
+{
 public:
     JsonReader(RequestHandler& request_handler);
 

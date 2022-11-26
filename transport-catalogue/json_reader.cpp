@@ -1,8 +1,11 @@
 #include "json_reader.h"
+#include "json_builder.h"
 #include <algorithm>
 #include <sstream>
 
-JsonReader::JsonReader(transport::request::RequestHandler& request_handler) : request_handler_(request_handler)
+namespace transport::request {
+
+JsonReader::JsonReader(RequestHandler& request_handler) : request_handler_(request_handler)
 {
 }
 
@@ -10,7 +13,7 @@ void JsonReader::Exec(std::istream& in, std::ostream& out)
 {
     const json::Document json_document = json::Load(in);
     const json::Node& json_root_node = json_document.GetRoot();
-    const json::Dict& dictionary = json_root_node.AsMap();
+    const json::Dict& dictionary = json_root_node.AsDict();
 
     if(dictionary.count("base_requests"s) != 0)
     {
@@ -19,16 +22,16 @@ void JsonReader::Exec(std::istream& in, std::ostream& out)
         const auto& json_base_requests = dictionary.at("base_requests"s).AsArray();
         for(const auto& json_base_request : json_base_requests)
         {
-            std::string type = json_base_request.AsMap().at("type"s).AsString();
+            std::string type = json_base_request.AsDict().at("type"s).AsString();
             if(type == "Stop"s)
             {
-                double lat = json_base_request.AsMap().at("latitude"s).AsDouble();
-                double lng = json_base_request.AsMap().at("longitude"s).AsDouble();
-                std::string name = json_base_request.AsMap().at("name"s).AsString();
+                double lat = json_base_request.AsDict().at("latitude"s).AsDouble();
+                double lng = json_base_request.AsDict().at("longitude"s).AsDouble();
+                std::string name = json_base_request.AsDict().at("name"s).AsString();
 
                 request_handler_.AddStop(name, lat, lng);
 
-                distances[name] = json_base_request.AsMap().at("road_distances"s).AsMap();
+                distances[name] = json_base_request.AsDict().at("road_distances"s).AsDict();
             }
         }
 
@@ -42,10 +45,10 @@ void JsonReader::Exec(std::istream& in, std::ostream& out)
 
         for(const auto& json_base_request : json_base_requests)
         {
-            std::string type = json_base_request.AsMap().at("type"s).AsString();
+            std::string type = json_base_request.AsDict().at("type"s).AsString();
             if(type == "Bus"s)
             {
-                auto& json_route = json_base_request.AsMap();
+                auto& json_route = json_base_request.AsDict();
 
                 std::vector<std::string> stops;
                 for(auto& stop : json_route.at("stops"s).AsArray())
@@ -63,7 +66,7 @@ void JsonReader::Exec(std::istream& in, std::ostream& out)
 
     if(dictionary.count("render_settings"s) != 0)
     {
-        const json::Dict& json_render_settings = dictionary.at("render_settings"s).AsMap();
+        const json::Dict& json_render_settings = dictionary.at("render_settings"s).AsDict();
         request_handler_.SetRendererSettings(GetRenderSettings(json_render_settings));
     }
 
@@ -80,36 +83,37 @@ void JsonReader::Exec(std::istream& in, std::ostream& out)
 
 void JsonReader::RequestsProcessing(const json::Array& json_stat_requests, std::ostream& out)
 {
-    json::Array json_response;
+    json::Builder json_responses;
+    json_responses.StartArray();
 
     for(const auto& stat_request : json_stat_requests)
     {
-        auto stat_request_map = stat_request.AsMap();
-
+        auto stat_request_map = stat_request.AsDict();
         int id = stat_request_map.at("id"s).AsInt();
+
+        json::Builder json_response;
+        json_response.StartDict().Key("request_id"s).Value(json::Node(id));
+
         const std::string& type = stat_request_map.at("type"s).AsString();
-
-        json::Dict response;
-        response.insert({"request_id"s, json::Node(id)});
-
         if(type == "Stop"s)
         {
             const std::string& stop_name = stat_request_map.at("name"s).AsString();
 
-            json::Array json_buses;
             auto buses = request_handler_.GetStopInfo(stop_name);
             if(!buses.buses_.empty() || buses.is_exist_)
             {
+                json_response.Key("buses"s).StartArray();
+
                 for(const auto bus: buses.buses_)
                 {
-                    json_buses.push_back(json::Node{static_cast<std::string>(bus)});
+                    json_response.Value(json::Node{static_cast<std::string>(bus)});
                 }
 
-                response.insert({"buses"s, json_buses});
+                json_response.EndArray();
             }
             else
             {
-                response.insert({"error_message"s, json::Node("not found"s)});
+                json_response.Key("error_message"s).Value("not found"s);
             }
         }
         else if(type == "Bus"s)
@@ -118,15 +122,16 @@ void JsonReader::RequestsProcessing(const json::Array& json_stat_requests, std::
 
             if(request_handler_.FindRoute(bus_name) == nullptr)
             {
-                response.insert({"error_message"s, json::Node("not found"s)});
+                json_response.Key("error_message"s).Value("not found"s);
             }
             else
             {
                 auto route = request_handler_.GetRouteInfo(bus_name);
-                response.insert({"curvature", json::Node(route.curvature_)});
-                response.insert({"stop_count", json::Node(static_cast<int>(route.stops_count_))});
-                response.insert({"unique_stop_count", json::Node(static_cast<int>(route.unique_stops_count_))});
-                response.insert({"route_length", json::Node(static_cast<double>(route.distance_))});
+
+                json_response.Key("curvature"s).Value(route.curvature_)
+                             .Key("stop_count"s).Value(static_cast<int>(route.stops_count_))
+                             .Key("unique_stop_count"s).Value(static_cast<int>(route.unique_stops_count_))
+                             .Key("route_length"s).Value(static_cast<double>(route.distance_));
             }
         }
         else if(type == "Map"s)
@@ -135,13 +140,16 @@ void JsonReader::RequestsProcessing(const json::Array& json_stat_requests, std::
             svg::Document svg = request_handler_.RenderMap();
             svg.Render(o);
 
-            response.insert({"map"s, json::Node(o.str())});
+            json_response.Key("map"s).Value(o.str());
         }
 
-        json_response.push_back(response);
+        json_response.EndDict();
+        json_responses.Value(json_response.Build());
     }
 
-    json::Print(json::Document(json::Node(std::move(json_response))), out);
+    json_responses.EndArray();
+
+    json::Print(json::Document{json_responses.Build()}, out);
 }
 
 svg::Color JsonReader::ReadColor(const json::Node& json_color)
@@ -198,3 +206,5 @@ transport::renderer::RenderSettings JsonReader::GetRenderSettings(const json::Di
 
     return render_settings;
 }
+
+} // namespace transport::request

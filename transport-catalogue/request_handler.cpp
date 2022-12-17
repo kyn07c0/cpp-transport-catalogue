@@ -2,21 +2,19 @@
 
 namespace transport::request {
 
-RequestHandler::RequestHandler(transport::Catalogue &catalogue, transport::renderer::MapRenderer &map_renderer)
-        : catalogue_(catalogue), map_renderer_(map_renderer)
+RequestHandler::RequestHandler(transport::Catalogue& catalogue, route::Router& router, transport::renderer::MapRenderer& map_renderer)
+        : catalogue_(catalogue), router_(router), map_renderer_(map_renderer)
 {
 }
-
-// ------------------------------------ Transport catalogue ------------------------------------------
 
 void RequestHandler::AddStop(const std::string &name, double lat, double lng)
 {
     catalogue_.AddStop(name, lat, lng);
 }
 
-void RequestHandler::AddRoute(const std::string &name, const std::vector<std::string> &stops, bool is_roundtrip)
+void RequestHandler::AddBus(const std::string &name, const std::vector<std::string> &stops, bool is_roundtrip)
 {
-    catalogue_.AddRoute(name, stops, is_roundtrip);
+    catalogue_.AddBus(name, stops, is_roundtrip);
 }
 
 void RequestHandler::AddDistance(const std::string &stop1, const std::string &stop2, uint32_t distance)
@@ -24,45 +22,93 @@ void RequestHandler::AddDistance(const std::string &stop1, const std::string &st
     catalogue_.AddDistance(stop1, stop2, distance);
 }
 
-domain::Route *RequestHandler::FindRoute(const std::string_view &name) const
+const std::vector<const domain::Stop*> RequestHandler::GetStops() const
 {
-    return catalogue_.FindRoute(name);
+    return catalogue_.GetStops();
 }
 
-domain::StopInfo RequestHandler::GetStopInfo(const std::string &name) const
+const std::vector<const domain::Bus*> RequestHandler::GetBuses() const
+{
+    return catalogue_.GetBuses();
+}
+
+const std::vector<domain::Stop*> RequestHandler::GetBusStops(const domain::Bus* bus)
+{
+    return catalogue_.GetBusStops(bus);
+}
+
+double RequestHandler::GetDistance(const std::string& stop1, const std::string& stop2) const
+{
+    return catalogue_.GetDistance(stop1, stop2);
+}
+
+domain::Bus *RequestHandler::FindBus(const std::string_view &name) const
+{
+    return catalogue_.FindBus(name);
+}
+
+domain::StopInfo RequestHandler::GetStopInfo(const std::string_view name) const
 {
     return catalogue_.GetStopInfo(name);
 }
 
-domain::RouteInfo RequestHandler::GetRouteInfo(const std::string_view &name) const
+domain::BusInfo RequestHandler::GetBusInfo(const std::string_view name) const
 {
-    return catalogue_.GetRouteInfo(name);
+    return catalogue_.GetBusInfo(name);
 }
 
-// ------------------------------------ Map renderer -------------------------------------------------
+std::optional<route::RouteInfo> RequestHandler::GetRouteInfo(const std::string_view from, const std::string_view to) const
+{
+    return router_.GetRouteInfo(from, to);
+}
 
-void RequestHandler::SetRendererSettings(transport::renderer::RenderSettings &&renderer_settings)
+void RequestHandler::SetRendererSettings(transport::renderer::RenderSettings&& renderer_settings)
 {
     map_renderer_.SetRendererSettings(std::move(renderer_settings));
+}
+
+void RequestHandler::SetRoutingSettings(route::Settings&& routing_settings)
+{
+    router_.SetSettings(std::move(routing_settings));
+}
+
+void RequestHandler::AddStopToRouter(const std::string_view name)
+{
+    router_.AddStop(name);
+}
+
+void RequestHandler::AddWaitEdgeToRouter(const std::string_view stop_name)
+{
+    router_.AddWaitEdge(stop_name);
+}
+
+void RequestHandler::AddBusEdgeToRouter(const std::string_view stop_from, const std::string_view stop_to, const std::string_view bus_name, const int span_count, const int dist)
+{
+    router_.AddBusEdge(stop_from, stop_to, bus_name, span_count, dist);
+}
+
+void RequestHandler::BuildRouter()
+{
+    router_.Build();
 }
 
 svg::Document RequestHandler::RenderMap() const
 {
     svg::Document result;
-    std::vector<const domain::Route *> routes_for_render;
+    std::vector<const domain::Bus *> buses_for_render;
     std::vector<const domain::Stop *> stops_for_render;
 
     std::unordered_set<const domain::Stop *> usered_stops;
     std::vector<geo::Coordinates> points;
 
-    for(const auto *route: catalogue_.GetRoutes())
+    for(const auto *route: catalogue_.GetBuses())
     {
         if(!route->stops_.empty())
         {
-            routes_for_render.push_back(route);
+            buses_for_render.push_back(route);
             for(const auto *stop: catalogue_.GetStops())
             {
-                if(usered_stops.count(stop) == 0 && catalogue_.HasRoutes(stop))
+                if(usered_stops.count(stop) == 0 && catalogue_.HasBuses(stop))
                 {
                     usered_stops.insert(stop);
                     stops_for_render.push_back(stop);
@@ -74,7 +120,7 @@ svg::Document RequestHandler::RenderMap() const
 
     map_renderer_.CalculateSphereProjector(points);
 
-    std::sort(routes_for_render.begin(), routes_for_render.end(), [](const domain::Route *lhs, const domain::Route *rhs) {
+    std::sort(buses_for_render.begin(), buses_for_render.end(), [](const domain::Bus *lhs, const domain::Bus *rhs) {
         return lhs->name_ < rhs->name_;
     });
 
@@ -83,23 +129,23 @@ svg::Document RequestHandler::RenderMap() const
     });
 
     size_t color_counter = 0;
-    for(const domain::Route *route: routes_for_render)
+    for(const domain::Bus *bus: buses_for_render)
     {
-        map_renderer_.RenderRoute(result, route, color_counter);
+        map_renderer_.RenderBus(result, bus, color_counter);
         ++color_counter;
     }
 
     color_counter = 0;
-    for(const domain::Route *route: routes_for_render)
+    for(const domain::Bus *bus: buses_for_render)
     {
-        map_renderer_.RenderRouteName(result, route, color_counter);
+        map_renderer_.RenderBusName(result, bus, color_counter);
         ++color_counter;
     }
 
     usered_stops = {};
     for(const domain::Stop *stop: stops_for_render)
     {
-        if(usered_stops.count(stop) > 0 || catalogue_.GetRoutesByStop(stop->name_).empty())
+        if(usered_stops.count(stop) > 0 || catalogue_.GetBusesByStop(stop->name_).empty())
         {
             continue;
         }
@@ -111,7 +157,7 @@ svg::Document RequestHandler::RenderMap() const
     usered_stops = {};
     for(const domain::Stop *stop: stops_for_render)
     {
-        if(usered_stops.count(stop) > 0 || catalogue_.GetRoutesByStop(stop->name_).empty())
+        if(usered_stops.count(stop) > 0 || catalogue_.GetBusesByStop(stop->name_).empty())
         {
             continue;
         }

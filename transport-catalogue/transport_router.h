@@ -8,8 +8,8 @@ namespace route {
 
 struct Settings
 {
-    double bus_wait_time = 6;
-    double bus_velocity = 40.0;
+    double bus_wait_time;
+    double bus_velocity;
 };
 
 struct RouteWait

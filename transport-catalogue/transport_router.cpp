@@ -3,6 +3,9 @@
 #include <utility>
 
 namespace route {
+    
+const int METERS_IN_KILOMETER = 1000;
+const int MINUTES_IN_HOUR = 60;    
 
 Router::Router(const size_t graph_size) : graph_(graph_size)
 {
@@ -23,8 +26,8 @@ void Router::AddWaitEdge(const std::string_view stop_name)
 
 void Router::AddBusEdge(const std::string_view from, const std::string_view to, const std::string_view bus_name, const int span_count, const int distance)
 {
-    graph::Edge<double> edge = {vertex_id_[from].end_wait, vertex_id_[to].start_wait, distance / (settings_.bus_velocity * 1000.0 / 60.0)};
-    double time = distance / (settings_.bus_velocity * 1000.0 / 60.0);
+    graph::Edge<double> edge = {vertex_id_[from].end_wait, vertex_id_[to].start_wait, distance / (settings_.bus_velocity * METERS_IN_KILOMETER / MINUTES_IN_HOUR)};
+    double time = distance / (settings_.bus_velocity * METERS_IN_KILOMETER / MINUTES_IN_HOUR);
 
     EdgeInfo edge_info{edge, bus_name, span_count, time};
     edges_.push_back(edge_info);

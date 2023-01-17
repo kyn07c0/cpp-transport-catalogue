@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="transport_catalogue"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/yura/projects/yp/transport-catalogue/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/yura/projects/yp/transport-catalogue/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/yura/projects/yp/transport-catalogue/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/yura/projects/yp/transport-catalogue/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/yura/projects/yp/transport-catalogue/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/yura/projects/yp/transport-catalogue/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/yura/projects/yp/transport-catalogue/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/yura/projects/yp/transport-catalogue/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/yura/projects/yp/transport-catalogue/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/yura/projects/yp/transport-catalogue/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/yura/projects/yp/transport-catalogue/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/yura/projects/yp/transport-catalogue/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/yura/projects/yp/transport-catalogue/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/yura/projects/yp/transport-catalogue/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/yura/projects/yp/transport-catalogue/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="transport_catalogue">
+				<Option output="/home/yura/projects/yp/transport-catalogue/cmake-build-debug/transport_catalogue" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/yura/projects/yp/transport-catalogue/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/yura/projects/yp/protobuf_package/include"/>
+					<Add directory="/home/yura/projects/yp/transport-catalogue/cmake-build-debug"/>
+					<Add directory="/usr/include/c++/10"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/10"/>
+					<Add directory="/usr/include/c++/10/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/10/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/yura/projects/yp/transport-catalogue/cmake-build-debug/Makefile&quot;  VERBOSE=1 transport_catalogue"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/yura/projects/yp/transport-catalogue/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/yura/projects/yp/transport-catalogue/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/yura/projects/yp/transport-catalogue/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="transport_catalogue/fast">
+				<Option output="/home/yura/projects/yp/transport-catalogue/cmake-build-debug/transport_catalogue" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/yura/projects/yp/transport-catalogue/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/yura/projects/yp/protobuf_package/include"/>
+					<Add directory="/home/yura/projects/yp/transport-catalogue/cmake-build-debug"/>
+					<Add directory="/usr/include/c++/10"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/10"/>
+					<Add directory="/usr/include/c++/10/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/10/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/yura/projects/yp/transport-catalogue/cmake-build-debug/Makefile&quot;  VERBOSE=1 transport_catalogue/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/yura/projects/yp/transport-catalogue/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/yura/projects/yp/transport-catalogue/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/yura/projects/yp/transport-catalogue/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/cmake-build-debug/transport_catalogue.pb.cc">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/cmake-build-debug/transport_catalogue.pb.h">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/cmake-build-debug/transport_catalogue.pb.h.rule">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/domain.cpp">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/domain.h">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/geo.cpp">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/geo.h">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/graph.h">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/input_reader.cpp">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/input_reader.h">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/json.cpp">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/json.h">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/json_builder.cpp">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/json_builder.h">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/json_reader.cpp">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/json_reader.h">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/main.cpp">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/map_renderer.cpp">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/map_renderer.h">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/ranges.h">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/request_handler.cpp">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/request_handler.h">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/router.h">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/serialization.cpp">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/serialization.h">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/stat_reader.cpp">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/stat_reader.h">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/svg.cpp">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/svg.h">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/transport_catalogue.cpp">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/transport_catalogue.h">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/transport_catalogue.proto">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/transport_router.cpp">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/transport_router.h">
+			<Option target="transport_catalogue"/>
+		</Unit>
+		<Unit filename="/home/yura/projects/yp/transport-catalogue/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

@@ -10,7 +10,7 @@ namespace transport::renderer {
 
 inline const double EPSILON = 1e-6;
 
-struct RenderSettings
+struct Settings
 {
     double width;
     double height;
@@ -99,7 +99,7 @@ public:
     }
 
 private:
-    double padding_;
+    double padding_{};
     double min_lon_ = 0;
     double max_lat_ = 0;
     double zoom_coeff_ = 0;
@@ -110,17 +110,18 @@ class MapRenderer
 public:
     MapRenderer() = default;
 
-    void SetRendererSettings(RenderSettings&& renderer_settings);
+    void SetSettings(Settings&& renderer_settings);
+    Settings GetSettings();
 
     void CalculateSphereProjector(const std::vector<geo::Coordinates>& points);
 
-    void RenderRoute(svg::Document &doc, const domain::Route *route, size_t color_number);
-    void RenderRouteName(svg::Document &doc, const domain::Route *route, size_t color_number);
-    void RenderStop(svg::Document &doc, const domain::Stop *stop);
-    void RenderStopName(svg::Document &doc, const domain::Stop *stop);
+    void RenderBus(svg::Document& doc, const domain::Bus* bus, size_t color_number);
+    void RenderBusName(svg::Document& doc, const domain::Bus* bus, size_t color_number);
+    void RenderStop(svg::Document& doc, const domain::Stop* stop);
+    void RenderStopName(svg::Document& doc, const domain::Stop* stop);
 
 private:
-    RenderSettings render_setting_;
+    Settings setting_;
     SphereProjector sphere_projector_;
 };
 

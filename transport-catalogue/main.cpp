@@ -4,14 +4,46 @@
 #include "map_renderer.h"
 #include "request_handler.h"
 
-int main()
+using namespace std::literals;
+
+void PrintUsage(std::ostream& stream = std::cerr)
 {
-    transport::Catalogue catalogue;
-    route::Router route;
-    transport::renderer::MapRenderer map_renderer;
-    transport::request::RequestHandler request_handler(catalogue, route, map_renderer);
-    transport::request::JsonReader json_reader(request_handler);
-    json_reader.Exec(std::cin, std::cout);
+    stream << "Usage: transport_catalogue [make_base|process_requests]\n"sv;
+}
+
+int main(int argc, char* argv[])
+{
+    if(argc != 2)
+    {
+        PrintUsage();
+        return 1;
+    }
+
+    const std::string_view mode(argv[1]);
+
+    if(mode == "make_base"sv)
+    {
+        transport::Catalogue transport_catalogue;
+        route::TransportRouter transport_router;
+        transport::renderer::MapRenderer map_renderer;
+        transport::request::RequestHandler request_handler(transport_catalogue, transport_router, map_renderer);
+        transport::request::JsonReader json_reader(request_handler, transport_catalogue, map_renderer, transport_router);
+        json_reader.ExecMakeBase(std::cin);
+    }
+    else if(mode == "process_requests"sv)
+    {
+        transport::Catalogue transport_catalogue;
+        route::TransportRouter transport_router;
+        transport::renderer::MapRenderer map_renderer;
+        transport::request::RequestHandler request_handler(transport_catalogue, transport_router, map_renderer);
+        transport::request::JsonReader json_reader(request_handler, transport_catalogue, map_renderer, transport_router);
+        json_reader.ExecProcessRequest(std::cin, std::cout);
+    }
+    else
+    {
+        PrintUsage();
+        return 1;
+    }
 
     return 0;
 }

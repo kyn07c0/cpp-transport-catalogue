@@ -51,32 +51,43 @@ struct Vertexe
     size_t end_wait;
 };
 
-class Router
+class TransportRouter
 {
 public:
     using Graph = graph::DirectedWeightedGraph<double>;
     using Route = graph::Router<double>;
 
-    Router() = default;
-    explicit Router(const size_t graph_size);
+    TransportRouter() = default;
+    explicit TransportRouter(size_t graph_size);
 
-    void SetSettings(Settings&& settings);
-    void AddWaitEdge(const std::string_view stop_name);
-    void AddBusEdge(const std::string_view from, const std::string_view to, const std::string_view bus_name, const int span_count, const int distance);
-    void AddStop(const std::string_view stop_name);
+    void SetSettings(Settings& settings);
+    Settings GetSettings();
+
+    void SetGraph(const Graph& graph);
+    std::optional<graph::DirectedWeightedGraph<double>> GetGraph();
+
+    void SetStopVertexIds(std::unordered_map<std::string_view, Vertexe> stop_vertex_ids);
+    const std::unordered_map<std::string_view, Vertexe>& GetStopVertexIds() const;
+
+    void SetEdgesInfo(std::vector<EdgeInfo> edges_info);
+    std::vector<EdgeInfo> GetEdgesInfo();
+
+    void AddWaitEdge(std::string_view stop_name);
+    void AddBusEdge(std::string_view from, std::string_view to, std::string_view bus_name, int span_count, int distance);
+    void AddStop(std::string_view stop_name);
 
     void Build();
 
-    std::optional<RouteInfo> GetRouteInfo(const std::string_view from, const std::string_view to) const;
+    std::optional<RouteInfo> GetRouteInfo(std::string_view from, std::string_view to) const;
 
 private:
-    Settings settings_;
+    Settings settings_ = {};
 
     std::optional<Graph> graph_ = std::nullopt;
     std::optional<Route> router_ = std::nullopt;
 
     std::unordered_map<std::string_view, Vertexe> vertex_id_;
-    std::vector<EdgeInfo> edges_;
+    std::vector<EdgeInfo> edges_info_;
 };
 
 } //namespace transport

@@ -1,0 +1,135 @@
+syntax = "proto3";
+
+package proto;
+
+message Coordinates
+{
+    double lat = 1;
+    double lng = 2;
+}
+
+message Stop
+{
+    string name = 1;
+    Coordinates coordinates = 2;
+}
+
+message Distance
+{
+    string stop_from = 1;
+    string stop_to = 2;
+    double distance = 3;
+}
+
+message Bus
+{
+    string name = 1;
+    repeated Stop stops = 2;
+    bool is_roundtrip = 3;
+}
+
+message TransportCatalogue
+{
+    repeated Stop stops = 1;
+    repeated Distance distances = 2;
+    repeated Bus buses = 3;
+}
+
+message Point
+{
+    double x = 1;
+    double y = 2;
+};
+
+message Rgb
+{
+    uint32 red = 1;
+    uint32 green = 2;
+    uint32 blue = 3;
+};
+
+message Rgba
+{
+    uint32 red = 1;
+    uint32 green = 2;
+    uint32 blue = 3;
+    double opacity = 4;
+};
+
+message Color
+{
+    string color_type = 1;
+    string name = 2;
+    Rgb rgb = 3;
+    Rgba rgba = 4;
+}
+
+message RenderSettings
+{
+    double width = 1;
+    double height = 2;
+    double padding = 3;
+    double line_width = 4;
+    double stop_radius = 5;
+    uint32 bus_label_font_size = 6;
+    Point bus_label_offset = 7;
+    uint32 stop_label_font_size = 8;
+    Point stop_label_offset = 9;
+    Color underlayer_color = 10;
+    double underlayer_width = 11;
+    repeated Color color_palette = 12;
+};
+
+message RoutingSettings
+{
+    double bus_wait_time = 1;
+    double bus_velocity = 2;
+}
+
+message Edge
+{
+    uint32 from = 1;
+    uint32 to = 2;
+    double weight = 3;
+};
+
+message IncidenceList
+{
+    repeated uint32 list = 1;
+}
+
+message Graph
+{
+    repeated Edge edges = 1;
+    repeated IncidenceList incidence_lists = 2;
+}
+
+message StopVertexId
+{
+    string name = 1;
+    uint32 start_wait = 2;
+    uint32 end_wait = 3;
+}
+
+message EdgeInfo
+{
+    Edge edge = 1;
+    string name = 2;
+    uint32 span_count = 3;
+    double time = 4;
+};
+
+message TransportRouter
+{
+    RoutingSettings routing_settings = 1;
+    Graph graph = 2;
+    repeated StopVertexId stop_vertex_ids = 3;
+    repeated EdgeInfo edges_info = 4;
+}
+
+message Main
+{
+    TransportCatalogue transport_catalogue = 1;
+    RenderSettings render_settings = 2;
+    TransportRouter transport_router = 3;
+}

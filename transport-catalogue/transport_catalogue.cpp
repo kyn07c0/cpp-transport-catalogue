@@ -6,7 +6,7 @@
 
 namespace transport {
 
-void Catalogue::AddStop(const std::string &name, double lat, double lng)
+void Catalogue::AddStop(const std::string& name, double lat, double lng)
 {
     geo::Coordinates coordinates = {lat, lng};
 
@@ -19,39 +19,40 @@ void Catalogue::AddStop(const std::string &name, double lat, double lng)
     stop_for_buses_[stop->name_];
 }
 
-void Catalogue::AddRoute(const std::string &name, const std::vector<std::string> &stops, bool is_roundtrip)
+void Catalogue::AddBus(const std::string& name, const std::vector<std::string>& stops, bool is_roundtrip)
 {
     std::deque<domain::Stop *> deque_stops;
-    auto *route = new domain::Route();
-    route->name_ = name;
-    route->is_roundtrip_ = is_roundtrip;
+    auto *bus = new domain::Bus();
+    bus->name_ = name;
+    bus->is_roundtrip_ = is_roundtrip;
 
-    for(const auto &stop: stops)
+    for(const auto& stop: stops)
     {
         domain::Stop *s = FindStop(stop);
         deque_stops.push_back(s);
-        s->buses_.insert(route->name_);
-        route->unique_stops_.insert(s->name_);
+        s->buses_.insert(bus->name_);
+        bus->unique_stops_.insert(s->name_);
     }
 
-    route->stops_ = deque_stops;
+    bus->stops_ = deque_stops;
 
-    for(auto stop: route->stops_)
+    for(auto stop: bus->stops_)
     {
-        stop_for_buses_[stop->name_].insert(route->name_);
+        stop_for_buses_[stop->name_].insert(bus->name_);
     }
 
-    for(size_t i = 0; i < route->stops_.size() - 1; ++i)
+    for(size_t i = 0; i < bus->stops_.size() - 1; ++i)
     {
-        route->geo_distance_ += ComputeDistance(route->stops_[i]->coordinates_, route->stops_[i + 1]->coordinates_);
-        route->distance_ += GetDistance(route->stops_[i]->name_, route->stops_[i + 1]->name_);
+        bus->geo_distance_ += ComputeDistance(bus->stops_[i]->coordinates_, bus->stops_[i + 1]->coordinates_);
+        bus->distance_ += GetDistance(bus->stops_[i]->name_, bus->stops_[i + 1]->name_);
     }
 
-    base_routes_.emplace_back(*route);
-    routes_.insert({route->name_, route});
+    base_buses_.emplace_back(*bus);
+    buses_.insert({bus->name_, bus});
 }
 
-domain::Stop *Catalogue::FindStop(const std::string_view &name) const {
+domain::Stop *Catalogue::FindStop(const std::string_view& name) const
+{
     if(stops_.count(name) != 0)
     {
         return stops_.at(name);
@@ -60,23 +61,24 @@ domain::Stop *Catalogue::FindStop(const std::string_view &name) const {
     return nullptr;
 }
 
-domain::Route *Catalogue::FindRoute(const std::string_view &name) const {
-    if(routes_.count(name) != 0)
+domain::Bus *Catalogue::FindBus(const std::string_view& name) const
+{
+    if(buses_.count(name) != 0)
     {
-        return routes_.at(name);
+        return buses_.at(name);
     }
 
     return nullptr;
 }
 
-void Catalogue::AddDistance(const std::string &stop1, const std::string &stop2, double distance)
+void Catalogue::AddDistance(const std::string& stop1, const std::string& stop2, double distance)
 {
-    domain::Stop *s1 = FindStop(stop1);
-    domain::Stop *s2 = FindStop(stop2);
+    domain::Stop* s1 = FindStop(stop1);
+    domain::Stop* s2 = FindStop(stop2);
     distance_between_stops_[s1->name_][s2->name_] = distance;
 }
 
-double Catalogue::GetDistance(const std::string &stop1, const std::string &stop2) const
+double Catalogue::GetDistance(const std::string& stop1, const std::string& stop2) const
 {
     if (distance_between_stops_.count(stop1) != 0)
     {
@@ -97,7 +99,12 @@ double Catalogue::GetDistance(const std::string &stop1, const std::string &stop2
     return geo::ComputeDistance(FindStop(stop1)->coordinates_, FindStop(stop2)->coordinates_);
 }
 
-domain::StopInfo Catalogue::GetStopInfo(const std::string_view &name) const
+std::unordered_map<std::string_view, std::unordered_map<std::string_view, double>> Catalogue::GetAllDistances() const
+{
+    return distance_between_stops_;
+}
+
+domain::StopInfo Catalogue::GetStopInfo(const std::string_view& name) const
 {
     domain::StopInfo stop_info;
     stop_info.name_ = name;
@@ -114,17 +121,17 @@ domain::StopInfo Catalogue::GetStopInfo(const std::string_view &name) const
     return stop_info;
 }
 
-domain::RouteInfo Catalogue::GetRouteInfo(const std::string_view &name) const
+domain::BusInfo Catalogue::GetBusInfo(const std::string_view& name) const
 {
-    domain::RouteInfo route_info;
-    domain::Route *route = FindRoute(name);
+    domain::BusInfo bus_info;
+    domain::Bus* route = FindBus(name);
 
     if(route == nullptr)
     {
-        return domain::RouteInfo({name, 0, 0, 0.0, 0.0});
+        return domain::BusInfo({name, 0, 0, 0.0, 0.0});
     }
 
-    route_info.unique_stops_count_ = route->unique_stops_.size();
+    bus_info.unique_stops_count_ = route->unique_stops_.size();
 
     double distance = 0.0;
     double geo_distance = 0.0;
@@ -146,44 +153,63 @@ domain::RouteInfo Catalogue::GetRouteInfo(const std::string_view &name) const
 
     if(route->is_roundtrip_)
     {
-        route_info.stops_count_ = route->stops_.size();
+        bus_info.stops_count_ = route->stops_.size();
         distance += GetDistance((*(route->stops_.end() - 1))->name_, (*route->stops_.begin())->name_);
         geo_distance += geo::ComputeDistance((*(route->stops_.end() - 1))->coordinates_, (*route->stops_.begin())->coordinates_);
     }
     else
     {
-        route_info.stops_count_ = route->stops_.size() * 2 - 1;
+        bus_info.stops_count_ = route->stops_.size() * 2 - 1;
     }
 
-    route_info.distance_ = distance;
-    route_info.curvature_ = distance / geo_distance;
+    bus_info.distance_ = distance;
+    bus_info.curvature_ = distance / geo_distance;
 
-    return route_info;
+    return bus_info;
 }
 
-const std::vector<const domain::Route *> Catalogue::GetRoutes() const
+std::vector<const domain::Bus*> Catalogue::GetBuses() const
 {
-    std::vector<const domain::Route *> routes;
-    for(auto &route: routes_)
+    std::vector<const domain::Bus*> buses;
+    for(auto& bus : base_buses_)
     {
-        routes.push_back(route.second);
+        buses.push_back(buses_.at(bus.name_));
     }
 
-    return routes;
+    return buses;
 }
 
-const std::vector<const domain::Stop *> Catalogue::GetStops() const
+std::vector<const domain::Stop*> Catalogue::GetStops() const
 {
-    std::vector<const domain::Stop *> stops;
-    for(auto &stop: stops_)
+    std::vector<const domain::Stop*> stops;
+
+    for(auto& stop: base_stops_)
     {
-        stops.push_back(stop.second);
+        stops.push_back(stops_.at(stop.name_));
     }
 
     return stops;
 }
 
-bool Catalogue::HasRoutes(const domain::Stop *stop) const
+std::vector<domain::Stop*> Catalogue::GetBusStops(const domain::Bus* bus) const
+{
+    if(bus->is_roundtrip_)
+    {
+        return std::vector(bus->stops_.begin(), bus->stops_.end());
+    }
+    else
+    {
+        std::vector<domain::Stop*> result(bus->stops_.begin(), bus->stops_.end());
+        for(auto it = bus->stops_.end() - 2; it >= bus->stops_.begin(); --it)
+        {
+            result.push_back(*it);
+        }
+
+        return result;
+    }
+}
+
+bool Catalogue::HasBuses(const domain::Stop *stop) const
 {
     if(stop_for_buses_.count(stop->name_))
     {
@@ -196,15 +222,15 @@ bool Catalogue::HasRoutes(const domain::Stop *stop) const
     return false;
 }
 
-std::unordered_set<const domain::Route *> Catalogue::GetRoutesByStop(std::string_view stop_name) const
+std::unordered_set<const domain::Bus*> Catalogue::GetBusesByStop(std::string_view stop_name) const
 {
-    std::unordered_set<const domain::Route *> routes;
-    for(auto &route: stop_for_buses_.at(stop_name))
+    std::unordered_set<const domain::Bus*> buses;
+    for(auto& route: stop_for_buses_.at(stop_name))
     {
-        routes.insert(routes_.at(route));
+        buses.insert(buses_.at(route));
     }
 
-    return routes;
+    return buses;
 }
 
 } // namespace transport

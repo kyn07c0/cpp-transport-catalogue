@@ -125,7 +125,7 @@ Node LoadDict(istream& input)
 Node LoadNull(std::istream& input)
 {
     string str(4, '\0');
-    for(int i = 0; i < 4; ++i)
+    for(size_t i = 0; i < 4; ++i)
     {
         input >> str[i];
     }
@@ -142,7 +142,7 @@ Node LoadBool(std::istream& input)
 {
     string str(5, '\0');
 
-    for(int i = 0; i < 4; ++i)
+    for(size_t i = 0; i < 4; ++i)
     {
         input >> str[i];
     }

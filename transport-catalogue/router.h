@@ -38,10 +38,6 @@ public:
     explicit Router(const Graph& graph, const std::optional<RoutesInternalData>& routes_internal_data);
 
     std::optional<RouteInfo> BuildRoute(VertexId from, VertexId to) const;
-    const RoutesInternalData& GetRoutesInternalData() const
-    {
-        return routes_internal_data_;
-    }
 
 private:
     void InitializeRoutesInternalData(const Graph& graph)
